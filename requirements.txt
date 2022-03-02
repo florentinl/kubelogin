@@ -1,1 +1,3 @@
 kubernetes
+cryptography
+pyyaml

@@ -1,3 +1,6 @@
+from email import header
+from kubeconfig_generator import get_kube_config
+from user_creator import role_binding_exists, create_role_binding
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from os import environ
@@ -5,6 +8,7 @@ import requests
 import shutil
 import string
 import random
+import json
 
 hostName = "localhost"
 serverPort = 8080
@@ -12,10 +16,14 @@ serverPort = 8080
 auth_uri = "https://auth.viarezo.fr"
 auth_token_uri = auth_uri + "/oauth/token"
 auth_authorize_uri = auth_uri + "/oauth/authorize"
+auth_api_uri = auth_uri + "/api/user/show/me"
+
 
 redirect_uri = "http://localhost:8080"
 client_id = environ["CLIENT_ID"]
 client_secret = environ["CLIENT_SECRET"]
+api_url = "https://138.195.139.40:6443"
+cluster_name = "staging"
 response_type = "code"
 scope = "default"
 grant_type = "authorization_code"
@@ -25,16 +33,26 @@ file = "kitten.jpg"
 
 class MyServer(BaseHTTPRequestHandler):
 
-    def get_credentials(self):
+    def get_credentials(self, token):
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+        get_infos = requests.get(auth_api_uri, headers=headers)
+        login = get_infos.json()["login"]
+        if not role_binding_exists(login):
+            create_role_binding(login)
+        
+        message = get_kube_config("viarezo:"+login, cluster_name, api_url)
+        
         self.send_response(200)
-        self.send_header('Content-type', 'image/jpeg')
+        self.send_header('Content-type', 'text/plain')
         self.end_headers()
-        with open(file, 'rb') as content:
-            shutil.copyfileobj(content, self.wfile)
+        self.wfile.write(bytes(message, encoding='utf-8'))
 
     def go_login(self):
         global last_state
-        last_state = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+        last_state = ''.join(random.choice(string.ascii_letters)
+                             for _ in range(10))
         data = {
             "redirect_uri": redirect_uri,
             "client_id": client_id,
@@ -67,7 +85,8 @@ class MyServer(BaseHTTPRequestHandler):
             f"{auth_token_uri}", headers=headers, data=data)
         print(get_token.status_code)
         if get_token.status_code == 200:
-            self.get_credentials()
+            token = get_token.json()["access_token"]
+            self.get_credentials(token)
         else:
             self.go_login()
 
