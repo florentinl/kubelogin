@@ -1,14 +1,11 @@
-from email import header
 from kubeconfig_generator import get_kube_config
 from user_creator import role_binding_exists, create_role_binding
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from os import environ
 import requests
-import shutil
 import string
 import random
-import json
 
 hostName = "localhost"
 serverPort = 8080
@@ -19,11 +16,12 @@ auth_authorize_uri = auth_uri + "/oauth/authorize"
 auth_api_uri = auth_uri + "/api/user/show/me"
 
 
-redirect_uri = "http://localhost:8080"
+redirect_uri = environ["REDIRECT_URI"]
 client_id = environ["CLIENT_ID"]
 client_secret = environ["CLIENT_SECRET"]
-api_url = "https://138.195.139.40:6443"
+api_url = environ["API_URL"]
 cluster_name = "staging"
+
 response_type = "code"
 scope = "default"
 grant_type = "authorization_code"

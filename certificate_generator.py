@@ -7,10 +7,11 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.primitives import serialization
+from os import environ
 
-
-cert = open("ca.crt", "rb")
-key = open("ca.key", "rb")
+cert_directory = environ["CERT_DIRECTORY"]
+cert = open(cert_directory + "ca.crt", "rb")
+key = open(cert_directory + "ca.key", "rb")
 root_key = load_pem_private_key(key.read(), None, default_backend())
 root_cert = x509.load_pem_x509_certificate(cert.read(), default_backend())
 
