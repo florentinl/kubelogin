@@ -9,11 +9,10 @@ from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.primitives import serialization
 from os import environ
 
-cert_directory = environ["CERT_DIRECTORY"]
-cert = open(cert_directory + "ca.crt", "rb")
-key = open(cert_directory + "ca.key", "rb")
-root_key = load_pem_private_key(key.read(), None, default_backend())
-root_cert = x509.load_pem_x509_certificate(cert.read(), default_backend())
+cert = bytes(environ["ROOT_CRT"], encoding="ascii")
+key = bytes(environ["ROOT_KEY"], encoding="ascii")
+root_key = load_pem_private_key(key, None, default_backend())
+root_cert = x509.load_pem_x509_certificate(cert, default_backend())
 
 # Now we want to generate a cert from that root
 

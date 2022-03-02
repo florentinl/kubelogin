@@ -1,0 +1,57 @@
+# Default values for kubelogin.
+# This is a YAML-formatted file.
+
+nameOverride: kubelogin # Mandatory
+namespace: kubelogin # Mandatory
+host: kubelogin.test.viarezo.fr # Mandatory
+image: # Mandatory
+  repository: registry.viarezo.fr/kubelogin/kubelogin
+  tag: "latest"
+  containerPort: 80
+
+env: test
+environ:
+  - name: REDIRECT_URI
+    value: http://kubelogin.test.viarezo.fr
+  - name: API_URL
+    value: https://138.195.139.40:6443
+  - name: ROOT_CRT
+    valueFrom:
+      secretKeyRef:
+        name: kubelogin-secret
+        key: root-crt
+  - name: ROOT_KEY
+    valueFrom:
+      secretKeyRef:
+        name: kubelogin-secret
+        key: root-key
+  - name: CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        name: kubelogin-secret
+        key: client-id
+  - name: CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: kubelogin-secret
+        key: client-secret
+labels:
+  env: test # of test/prod
+  app: kubelogin
+  function: frontend
+
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enable: true
+  tls:
+    clusterIssuer: letsencrypt # of letsencrypt/letsencrypt-staging
+    secretName: kubelogin-cert # Mandatory
+
+podAnnotations: {}
+securityContext: {}
+tolerations: []
+affinity: {}

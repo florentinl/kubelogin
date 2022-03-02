@@ -6,9 +6,9 @@ from os import environ
 import requests
 import string
 import random
-
+import sys
 hostName = "localhost"
-serverPort = 8080
+serverPort = 80
 
 auth_uri = "https://auth.viarezo.fr"
 auth_token_uri = auth_uri + "/oauth/token"
@@ -53,11 +53,12 @@ class MyServer(BaseHTTPRequestHandler):
                              for _ in range(10))
         data = {
             "redirect_uri": redirect_uri,
-            "client_id": client_id,
+            "client_id": client_id.strip(),
             "response_type": response_type,
             "state": last_state,
             "scope": scope
         }
+        print(client_id, client_secret)
         oauth_path = auth_authorize_uri + "/?"
         def param_formater(key): return f"{key}={data[key]}"
         oauth_path += "&".join(list(map(param_formater, data)))
@@ -73,8 +74,8 @@ class MyServer(BaseHTTPRequestHandler):
             "grant_type": grant_type,
             "code": code,
             "redirect_uri": redirect_uri,
-            "client_id": client_id,
-            "client_secret": client_secret
+            "client_id": client_id.strip(),
+            "client_secret": client_secret.strip()
         }
         headers = {
             "Content-Type": "application/x-www-form-urlencoded"
@@ -97,9 +98,9 @@ class MyServer(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    webServer = HTTPServer((hostName, serverPort), MyServer)
+    webServer = HTTPServer(("0.0.0.0", serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
-
+    print(sys.getdefaultencoding())
     try:
         webServer.serve_forever()
     except KeyboardInterrupt:

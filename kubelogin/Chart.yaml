@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kubelogin
+description: This Chart provides a basis for deploying static web apps.
+type: application
+version: 0.0.6
+appVersion: "1.0.1"

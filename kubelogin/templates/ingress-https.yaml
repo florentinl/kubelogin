@@ -1,0 +1,21 @@
+{{- if .Values.ingress.enable -}}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "kubelogin.fullname" . }}
+  namespace: {{ .Values.namespace }}
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`{{ .Values.host }}`)
+      services:
+        - kind: Service
+          name: {{ include "kubelogin.fullname" . }}
+          namespace: {{ .Values.namespace }}
+          port: {{ .Values.service.port }}
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName }}
+{{- end }}
