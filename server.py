@@ -1,5 +1,5 @@
 from kubeconfig_generator import get_kube_config
-from user_creator import role_binding_exists, create_role_binding
+from user_creator import create_namespace, role_binding_exists, create_role_binding
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from os import environ
@@ -37,11 +37,12 @@ class MyServer(BaseHTTPRequestHandler):
         }
         get_infos = requests.get(auth_api_uri, headers=headers)
         login = get_infos.json()["login"]
-        if not role_binding_exists(login):
-            create_role_binding(login)
-        
-        message = get_kube_config("viarezo:"+login, cluster_name, api_url)
-        
+        namespace = "formation-" + login
+        create_namespace(namespace)
+        create_role_binding(login,namespace)
+
+        message = get_kube_config("viarezo:"+login, cluster_name, api_url, namespace)
+
         self.send_response(200)
         self.send_header('Content-type', 'text/plain')
         self.end_headers()

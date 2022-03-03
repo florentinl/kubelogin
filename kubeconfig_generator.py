@@ -2,7 +2,7 @@ from certificate_generator import get_cert_and_key
 import yaml
 
 
-def get_kube_config(username, cluster_name, api_url):
+def get_kube_config(username, cluster_name, api_url, namespace):
     key, cert, ca = get_cert_and_key(username)
     kubeconfig = {'apiVersion': 'v1',
                   'clusters': [{'cluster':
@@ -10,7 +10,7 @@ def get_kube_config(username, cluster_name, api_url):
                                  'server': api_url},
                                 'name': cluster_name}],
                   'contexts': [{'context': {'cluster': cluster_name,
-                                            'namespace': 'default',
+                                            'namespace': namespace,
                                             'user': username},
                                 'name': f'{username}@{cluster_name}'}],
                   'current-context': f'{username}@{cluster_name}',
