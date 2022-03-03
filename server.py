@@ -45,6 +45,7 @@ class MyServer(BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.send_header('Content-type', 'text/plain')
+        self.send_header('Content-disposition', 'attachment; filename=config_tmp')
         self.end_headers()
         self.wfile.write(bytes(message, encoding='utf-8'))
 
