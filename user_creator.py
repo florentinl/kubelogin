@@ -30,7 +30,7 @@ def build_role_binding(name, namespace):
     username = "viarezo:" + name
     metadata = client.V1ObjectMeta(name=username, namespace=namespace)
     role_ref = client.V1RoleRef(
-        api_group="rbac.authorization.k8s.io", kind="ClusterRole", name="viarezo-team")
+        api_group="rbac.authorization.k8s.io", kind="ClusterRole", name="cluster-admin")
     subject = client.V1Subject(
         api_group="rbac.authorization.k8s.io", kind="User", name=username)
     return client.V1RoleBinding(metadata=metadata, role_ref=role_ref, subjects=[subject])

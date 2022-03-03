@@ -25,7 +25,7 @@ def get_cert_and_key(username):
     )
     new_subject = x509.Name([
         x509.NameAttribute(NameOID.COMMON_NAME, username),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "viarezo")
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "viarezo-team")
     ])
 
     certificate = x509.CertificateBuilder().subject_name(
